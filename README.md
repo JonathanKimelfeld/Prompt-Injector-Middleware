@@ -198,21 +198,19 @@ curl -X POST http://localhost:8000/v1/chat/completions \
 
 ```
 flax_assigment/
-├── README.md                  # This file
-├── ARCHITECTURE.md            # System design & data flow
-├── IMPLEMENTATION_PLAN.md     # Step-by-step build plan
-├── SYSTEM_PROMPT.md           # Prompt engineering explanation
+├── README.md                  # Setup instructions and design decisions
+├── SYSTEM_PROMPT.md           # System prompt + prompt engineering explanation
 ├── docker-compose.yml         # Full stack orchestration
 ├── .env.example               # Configuration template
 ├── .env                       # Your secrets (git-ignored)
 ├── .gitignore
-├── verify.sh                  # Automated verification script
+├── verify.sh                  # Automated end-to-end verification script
 └── middleware/
     ├── Dockerfile
     ├── requirements.txt
     ├── main.py                # FastAPI app — proxy + injection logic
-    ├── SYSTEM_PROMPT.txt      # The extraction system prompt
-    ├── test_main.py           # Unit tests (100% coverage)
+    ├── SYSTEM_PROMPT.txt      # The extraction system prompt (loaded at runtime)
+    ├── test_main.py           # Unit tests (23 tests, 100% coverage)
     └── pytest.ini
 ```
 
