@@ -25,18 +25,14 @@ The middleware is invisible — it modifies only the request.
 **Prerequisites:** Docker Desktop, an OpenAI API key.
 
 ```bash
-# 1. Clone and enter the project
-git clone <repo-url>
-cd flax_assigment
 
-# 2. Configure your API key
-cp .env.example .env
-echo "OPENAI_API_KEY=sk-..." >> .env   # replace with your key
+# 1. Configure your API key
+echo "OPENAI_API_KEY=sk-..." > .env   # replace with your key
 
-# 3. Start the full stack
+# 2. Start the full stack
 docker-compose up -d
 
-# 4. Wait ~30 seconds, then open the UI
+# 3. Wait ~30 seconds, then open the UI
 open http://localhost:3000
 ```
 
@@ -98,7 +94,7 @@ Expected response:
 ## File Structure
 
 ```
-flax_assigment/
+middleware_assigment/
 ├── README.md                  # Setup instructions and design decisions
 ├── SYSTEM_PROMPT.md           # System prompt + prompt engineering explanation
 ├── docker-compose.yml         # Full stack orchestration

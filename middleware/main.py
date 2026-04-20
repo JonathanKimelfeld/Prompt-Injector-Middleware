@@ -133,6 +133,14 @@ async def chat_completions(request: Request, body: ChatCompletionRequest):
         "message_count": len(body.messages),
     }))
 
+    user_messages = [m for m in body.messages if m.get("role") == "user"]
+    if user_messages:
+        logger.info(json.dumps({
+            "event": "user_message",
+            "request_id": request_id,
+            "content": user_messages[-1].get("content", ""),
+        }))
+
     modified_messages = inject_system_prompt(body.messages)
 
     logger.info(json.dumps({
@@ -160,12 +168,20 @@ async def chat_completions(request: Request, body: ChatCompletionRequest):
         response = await request.app.state.http_client.post(url, json=payload, headers=headers)
         response.raise_for_status()
 
+        data = response.json()
+        reply = data.get("choices", [{}])[0].get("message", {}).get("content", "")
+        logger.info(json.dumps({
+            "event": "response",
+            "request_id": request_id,
+            "content": reply,
+        }))
+
         logger.info(json.dumps({
             "event": "request_complete",
             "request_id": request_id,
         }))
 
-        return JSONResponse(content=response.json())
+        return JSONResponse(content=data)
 
     except httpx.HTTPStatusError as e:
         logger.error(json.dumps({
@@ -210,10 +226,26 @@ async def stream_openai_response(
                 }))
                 raise HTTPException(status_code=response.status_code, detail=error.decode())
 
+            response_text = []
             async for chunk in response.aiter_bytes():
                 yield chunk
+                # Accumulate text from SSE chunks for logging
+                for line in chunk.decode(errors="ignore").splitlines():
+                    if line.startswith("data: ") and line != "data: [DONE]":
+                        try:
+                            delta = json.loads(line[6:])
+                            token = delta.get("choices", [{}])[0].get("delta", {}).get("content", "")
+                            if token:
+                                response_text.append(token)
+                        except json.JSONDecodeError:
+                            pass
 
         duration = time.time() - start_time
+        logger.info(json.dumps({
+            "event": "response",
+            "request_id": request_id,
+            "content": "".join(response_text),
+        }))
         logger.info(json.dumps({
             "event": "upstream_request_complete",
             "request_id": request_id,
