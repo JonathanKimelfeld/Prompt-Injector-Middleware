@@ -269,12 +269,19 @@ async def test_stream_raises_502_on_request_error():
     """Should raise HTTPException 502 on network failure."""
     from fastapi import HTTPException as FastAPIHTTPException
 
-    mock_client = MagicMock()
-    mock_client.stream = MagicMock(side_effect=httpx.RequestError("network down"))
+    @asynccontextmanager
+    async def mock_stream(*args, **kwargs):
+        raise httpx.RequestError("network down")
+        yield  # makes this a valid async generator context manager
 
-    with pytest.raises((FastAPIHTTPException, httpx.RequestError)):
+    mock_client = MagicMock()
+    mock_client.stream = mock_stream
+
+    with pytest.raises(FastAPIHTTPException) as exc_info:
         async for _ in stream_openai_response(mock_client, "http://x", {}, {}, "req_test"):
             pass
+
+    assert exc_info.value.status_code == 502
 
 
 # ---------------------------------------------------------------------------

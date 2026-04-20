@@ -90,14 +90,26 @@ Expected response:
   "language": "en",
   "extraction_notes": null,
   "extracted_data": {
-    "sender": "sarah@startup.io",
-    "recipients": ["john@company.com"],
-    "cc": [],
-    "subject": "Meeting Reschedule",
-    "date_sent": null,
-    "body_summary": "Sarah asks John to reschedule their 1:1 from Tuesday to Wednesday at 3pm due to a conflict.",
-    "action_items": ["Reschedule 1:1 from Tuesday to Wednesday at 3pm"],
-    "sentiment": "neutral"
+    "fields": {
+      "sender": "sarah@startup.io",
+      "recipients": ["john@company.com"],
+      "cc": [],
+      "subject": "Meeting Reschedule",
+      "date_sent": null,
+      "body_summary": "Sarah asks John to reschedule their 1:1 from Tuesday to Wednesday at 3pm due to a conflict.",
+      "action_items": ["Reschedule 1:1 from Tuesday to Wednesday at 3pm"],
+      "sentiment": "neutral"
+    },
+    "fields_confidence": {
+      "sender": 1.0,
+      "recipients": 1.0,
+      "cc": 1.0,
+      "subject": 1.0,
+      "date_sent": 1.0,
+      "body_summary": 0.95,
+      "action_items": 0.9,
+      "sentiment": 0.85
+    }
   }
 }
 ```
@@ -120,25 +132,41 @@ Expected response:
 ```json
 {
   "document_type": "receipt",
-  "confidence": 1.0,
+  "confidence": 0.9,
   "language": "en",
-  "extraction_notes": null,
+  "extraction_notes": "Subtotal not explicitly listed; inferred from items.",
   "extracted_data": {
-    "merchant_name": "Cafe Central",
-    "merchant_address": "456 Main Street, Springfield",
-    "date": "2025-04-15",
-    "time": "09:23",
-    "items": [
-      {"description": "Cappuccino", "quantity": 1, "unit_price": 5.00, "total": 5.00},
-      {"description": "Croissant",  "quantity": 1, "unit_price": 4.50, "total": 4.50}
-    ],
-    "subtotal": 9.50,
-    "tax": 0.76,
-    "tip": null,
-    "total": 10.26,
-    "currency": "USD",
-    "payment_method": "credit",
-    "card_last_four": "5678"
+    "fields": {
+      "merchant_name": "Cafe Central",
+      "merchant_address": "456 Main Street, Springfield",
+      "date": "2025-04-15",
+      "time": "09:23",
+      "items": [
+        {"description": "Cappuccino", "quantity": 1, "unit_price": 5.00, "total": 5.00},
+        {"description": "Croissant",  "quantity": 1, "unit_price": 4.50, "total": 4.50}
+      ],
+      "subtotal": 9.50,
+      "tax": 0.76,
+      "tip": null,
+      "total": 10.26,
+      "currency": "USD",
+      "payment_method": "credit",
+      "card_last_four": "5678"
+    },
+    "fields_confidence": {
+      "merchant_name": 1.0,
+      "merchant_address": 1.0,
+      "date": 1.0,
+      "time": 1.0,
+      "items": 1.0,
+      "subtotal": 0.85,
+      "tax": 1.0,
+      "tip": 1.0,
+      "total": 1.0,
+      "currency": 0.9,
+      "payment_method": 0.85,
+      "card_last_four": 1.0
+    }
   }
 }
 ```
@@ -204,7 +232,6 @@ flax_assigment/
 ├── .env.example               # Configuration template
 ├── .env                       # Your secrets (git-ignored)
 ├── .gitignore
-├── verify.sh                  # Automated end-to-end verification script
 └── middleware/
     ├── Dockerfile
     ├── requirements.txt
